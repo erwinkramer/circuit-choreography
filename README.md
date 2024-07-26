@@ -9,7 +9,7 @@
 
 The Circuit Choreography pattern defines a choreographic message flow that maintains a closed circuit at all times.
 
-The pattern takes concepts from the [Compensating Transaction pattern](https://learn.microsoft.com/en-us/azure/architecture/patterns/compensating-transaction), [Circuit Breaker pattern](https://learn.microsoft.com/en-us/azure/architecture/patterns/circuit-breaker), [Saga distributed transactions pattern](https://learn.microsoft.com/en-us/azure/architecture/reference-architectures/saga/saga) and [Choreography pattern](https://learn.microsoft.com/en-us/azure/architecture/patterns/choreography) and essentially combines them into a robust and modern design pattern.
+The pattern integrates principles of distributed consistency, the [Compensating Transaction pattern](https://learn.microsoft.com/en-us/azure/architecture/patterns/compensating-transaction), the [Circuit Breaker pattern](https://learn.microsoft.com/en-us/azure/architecture/patterns/circuit-breaker), the [Saga distributed transactions pattern](https://learn.microsoft.com/en-us/azure/architecture/reference-architectures/saga/saga), and the [Choreography pattern](https://learn.microsoft.com/en-us/azure/architecture/patterns/choreography) to create a robust and modern design framework.
 
 ## Rules
 
