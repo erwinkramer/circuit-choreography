@@ -3,6 +3,8 @@
 [![CC BY-NC-SA 4.0][cc-by-nc-sa-shield]][cc-by-nc-sa]
 ![GitHub commit activity](https://img.shields.io/github/commit-activity/m/erwinkramer/circuit-choreography)
 
+![It 973 f.21v A Gentleman dancing with two Ladies, from 'Trattato dell'Arte del Ballare' (vellum) - Italian School, (15th century)](front-image.png)
+
 ## Introduction
 
 The Circuit Choreography pattern defines a choreographic message flow that maintains a closed circuit at all times.
