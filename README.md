@@ -205,7 +205,7 @@ An example of implementing Circuit Choreography with RESTful services within a r
 
 Consider a retail shop where a payment is being done by a payment service (initiating service), a fraud detection service is initiated (intermediate service) to validate the payment, and a CRM service is called (final service) to store customer preference and communication history. Every service implements a forward, backward and multiple restoration routes. The most crucial information is implemented in the URI, additional information might be implemented in the request body.
 
-The payment service implements an initiating forward route, which is a payment operation that is compensable and assumes the nearest service - in this case the fraud detection service - understands and utilizes the following operations:
+The **payment service** implements an initiating forward route, which is a payment operation that is compensable and assumes the nearest service - in this case the fraud detection service - understands and utilizes the following operations:
 
 - Backward route: A payment confirmation operation.
 - Restoration routes:
@@ -216,11 +216,11 @@ The definition might look like this:
 
 `PUT payments/{payment-id}/customer/{customer-id}?correlationId=[guid]&route=[forward/backwards/restoration][&restorationLevel=1/2]`
 
-The fraud detection service assumes the nearest services - in this case the CRM and payment service - understand and utilize the following operations:
+The **fraud detection service** assumes the nearest services - in this case the CRM and payment service (an intermediate service naturally has two services nearby in Circuit Choreography) - understand and utilize the following operations:
 
-- Forward route: A fraud detection operation that is compensable.
-- Backward route: An integrity confirmation operation.
-- Restoration routes:
+- Forward route (by the payment service): A fraud detection operation that is compensable.
+- Backward route (by the CRM service): An integrity confirmation operation.
+- Restoration routes (by any of the two nearby services):
   - Level 1: A voiding operation for compensation to revert the fraud detection on critical issues in the circuit.
   - Level 2: A disregarding operation where compensation is called for circuit break on a non-critical issue, for instance the CRM service could not handle the request.
 
@@ -228,11 +228,11 @@ The definition might look like this:
 
 `PUT fraudDetections/{payment-id}/customer/{customer-id}?correlationId=[guid]&route=[forward/backwards/restoration][&restorationLevel=1/2]`
 
-The CRM service assumes the nearest services - in this case the fraud detection and payment service - understand and utilize the following operations:
+The **CRM service** assumes the nearest services - in this case the fraud detection service - understands and utilizes the following operations:
 
 - Forward route: A custom preference operation that is compensable.
 - Backward route: A preference confirmation operation.
-- Restoration route:
+- Restoration routes:
   - Level 1: A disposing operation for compensation to revert the preference.
   - Level 2: A disregarding operation where compensation is called for circuit break on a non-critical issue, for instance the payment was cancelled.
 
