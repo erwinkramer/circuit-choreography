@@ -201,9 +201,9 @@ flowchart TD
 
 ## General implementation guidance
 
-Ann example of implementing Circuit Choreography with RESTful services within a retail system.
+An example of implementing Circuit Choreography with RESTful services within a retail system.
 
-Consider a retail shop where a payment is being done by a payment service (initiating service), a fraud detection service is initiated (intermediate service) to validate the payment, and a CRM service is called (final service) to store customer preference and communication history. Every service implements a forward, backward and multiple restoration routes. Additional information needed might be implemented in the request body.
+Consider a retail shop where a payment is being done by a payment service (initiating service), a fraud detection service is initiated (intermediate service) to validate the payment, and a CRM service is called (final service) to store customer preference and communication history. Every service implements a forward, backward and multiple restoration routes. The most crucial information is implemented in the URI, additional information might be implemented in the request body.
 
 The payment service implements an initiating forward route, which is a payment operation that is compensable and assumes the nearest service - in this case the fraud detection service - understands and utilizes the following operations:
 
