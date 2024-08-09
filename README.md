@@ -230,11 +230,10 @@ The definition might look like this:
 
 The **CRM service** assumes the nearest service - in this case the fraud detection service - understands and utilizes the following operations:
 
-- Forward route: A custom preference operation that is compensable.
-- Backward route: A preference confirmation operation.
+- Forward route: A customer preference operation that is compensable.
+- Backward route: A customer preference confirmation operation.
 - Restoration routes:
-  - Level 1: A disposing operation for compensation to revert the preference.
-  - Level 2: A disregarding operation where compensation is called for circuit break on a non-critical issue, for instance the payment was cancelled.
+  - Level 1: A disposing operation for compensation to revert the customer preference.
 
 The definition might look like this:
 
