@@ -228,7 +228,7 @@ The definition might look like this:
 
 `PUT fraudDetections/{payment-id}/customer/{customer-id}?correlationId=[guid]&route=[forward/backwards/restoration][&restorationLevel=1/2]`
 
-The **CRM service** assumes the nearest services - in this case the fraud detection service - understands and utilizes the following operations:
+The **CRM service** assumes the nearest service - in this case the fraud detection service - understands and utilizes the following operations:
 
 - Forward route: A custom preference operation that is compensable.
 - Backward route: A preference confirmation operation.
