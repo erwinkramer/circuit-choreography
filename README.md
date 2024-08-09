@@ -16,12 +16,17 @@ The pattern integrates principles of distributed consistency, the [Compensating 
 The following rules must be applied to implement Circuit Choreography:
 
 1. Any service handles atomic operations independently.
-2. A forward routing is the choreography that moves to one or more subsequent services and starts at the initiating service and completes at the final service.
-3. A backward routing is the choreography that moves back in opposite order and starts at the final service and completes at the initiating service.
-4. A restoration routing is the choreography that replaces both forward and backward routing, in case of an open circuit (initialized by a circuit breaker), and starts at the current service and completes at that same service.
-5. A restoration routing reverses the route and demands compensation from the preceding service, which in turn demands compensation from the next preceding service until the start of the restoration routing is reached.
-6. If a restoration routing fails moving to a next service, it activates a long running process that keeps trying to go in the same reversed order it started.
-7. The choreography maintains a closed circuit at all times, meaning: there is always a forward and backward route that completes. If they cannot complete, the circuit has to be restored by a restoration route.
+2. The choreography maintains a closed circuit at all times, meaning: there is always a **forward** and **backward** route that completes. If they cannot complete, the circuit has to be restored by a **restoration** route.
+3. Correlation between services in a choreography will always be implemented with a [Correlation ID](https://microsoft.github.io/code-with-engineering-playbook/observability/correlation-id/).
+4. A **forward** routing is the choreography that moves to one or more subsequent services and starts at the initiating service and completes at the final service.
+5. A **backward** routing is the choreography that moves back in opposite order and starts at the final service and completes at the initiating service.
+6. A **restoration** routing is the choreography that replaces both forward and backward routing, in case of an open circuit (initialized by a circuit breaker), and starts at the current service and completes at that same service.
+7. A restoration routing is definitive and reverses the route based on a restoration level and demands compensation from the preceding service, which in turn demands compensation from the next preceding service until the start of the restoration routing is reached.
+8. A **restoration level** defines the impact of the open circuit and determines what type of restoration is needed for a service. Levels can be defined by business acumen but must be arranged in ascending order, where 1 is most critical and demands full compensation, any level with higher numerical range might have less demanding compensation, for example:
+   - Level 1 does a serious reversal because of a critical issue.
+   - Level 2 might do a partial reversal.
+   - Level 3 might keep the transaction.
+9. If a restoration routing fails moving to a next service, it activates a long running process that keeps trying to go in the same reversed order it started.
 
 Optionally:
 
@@ -193,6 +198,47 @@ flowchart TD
 13-14: Initiating Service restored operations, compensates and calls the Intermediate Service.
 
 15: Intermediate Service transacts and completes the restoration.
+
+## General implementation guidance
+
+Ann example of implementing Circuit Choreography with RESTful services within a retail system.
+
+Consider a retail shop where a payment is being done by a payment service (initiating service), a fraud detection service is initiated (intermediate service) to validate the payment, and a CRM service is called (final service) to store customer preference and communication history. Every service implements a forward, backward and multiple restoration routes. Additional information needed might be implemented in the request body.
+
+The payment service implements an initiating forward route, which is a payment operation that is compensable and assumes the nearest service - in this case the fraud detection service - understands and utilizes the following operations:
+
+- Backward route: A payment confirmation operation.
+- Restoration routes:
+  - Level 1: A refund operation for compensating to revert the payment. For instance the fraud detection responded with a positive detection.
+  - Level 2: A disregarding operation where compensation is called for circuit break on a non-critical issue, for instance the fraud detection service passed down an issue with the CRM service.
+
+The definition might look like this:
+
+`PUT payments/{payment-id}/customer/{customer-id}?correlationId=[guid]&route=[forward/backwards/restoration][&restorationLevel=1/2]`
+
+The fraud detection service assumes the nearest services - in this case the CRM and payment service - understand and utilize the following operations:
+
+- Forward route: A fraud detection operation that is compensable.
+- Backward route: An integrity confirmation operation.
+- Restoration routes:
+  - Level 1: A voiding operation for compensation to revert the fraud detection on critical issues in the circuit.
+  - Level 2: A disregarding operation where compensation is called for circuit break on a non-critical issue, for instance the CRM service could not handle the request.
+
+The definition might look like this:
+
+`PUT fraudDetections/{payment-id}/customer/{customer-id}?correlationId=[guid]&route=[forward/backwards/restoration][&restorationLevel=1/2]`
+
+The CRM service assumes the nearest services - in this case the fraud detection and payment service - understand and utilize the following operations:
+
+- Forward route: A custom preference operation that is compensable.
+- Backward route: A preference confirmation operation.
+- Restoration route:
+  - Level 1: A disposing operation for compensation to revert the preference.
+  - Level 2: A disregarding operation where compensation is called for circuit break on a non-critical issue, for instance the payment was cancelled.
+
+The definition might look like this:
+
+`PUT customerPreferences/customer/{customer-id}/payment/{payment-id}?correlationId=[guid]&route=[forward/backwards/restoration][&restorationLevel=1/2]`
 
 ## License
 
